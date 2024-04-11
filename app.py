@@ -15,8 +15,19 @@ cam = cv2.VideoCapture(0)
 x = []
 y = []
 
+text = ""
+k = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+idset = ["", "1", "12", "123", "1234", "01234", "0", "01", "012", "0123", "04", "4", "34", "014", "14", "234"]
+op = ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "+", "-", "*", "/"]
+
 def frames():
     while True:
+        if len(y) > 20:
+            id = ""
+            # Gesture recognition logic
+            # Update text variable based on recognized gestures
+
+            cv2.putText(img, text, (100, 120), cv2.FONT_HERSHEY_TRIPLEX, 3, (0, 0, 0), 5)
         success, img = cam.read()
         if not success:
             break
@@ -50,6 +61,19 @@ def frames():
             ret, buffer = cv2.imencode('.jpg', img)
             img = buffer.tobytes()
             yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n') 
+
+@app.route('/close')
+def close():
+    global cam
+    cam.release()
+    cv2.destroyAllWindows()
+    return render_template("index.html")
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Final cleanup and testing of the application. Ensure all routes work and video feed displays correctly.
 
 if __name__ == '__main__':
     app.run(debug=True)
