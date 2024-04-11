@@ -12,6 +12,9 @@ global cam
 cam = cv2.VideoCapture(0)
 
 
+x = []
+y = []
+
 def frames():
     while True:
         success, img = cam.read()
@@ -23,13 +26,15 @@ def frames():
 
             if results.multi_hand_landmarks:
                 for handLms in results.multi_hand_landmarks:
-                    mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
+                    for id, lm in enumerate(handLms.landmark):
+                        h, w, c = img.shape
+                        if id == 0:
+                            x = []
+                            y = []
+                        x.append(int((lm.x) * w))
+                        y.append(int((1 - lm.y) * h))
 
-            ret, buffer = cv2.imencode('.jpg', img)
-            img = buffer.tobytes()
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n') 
 
-            
 @app.route('/video')
 def video():
     global cam
