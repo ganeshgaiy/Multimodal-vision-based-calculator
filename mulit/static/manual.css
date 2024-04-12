@@ -1,61 +1,97 @@
-/* manual.css */
-
-body {
-    font-family: Arial, sans-serif;
+/* Reset default margin and padding */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
+    box-sizing: border-box;
 }
 
+/* Body styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #c5981d; /* Bootstrap default background color */
+    color: #343a40; /* Bootstrap default text color */
+}
+
+/* Container styles */
 .container {
-    max-width: 800px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 20px;
-    text-align: center;
+    padding: 0 20px; /* Responsive padding */
 }
 
-h1 {
-    color: #333;
+/* Header styles */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #343a40; /* Bootstrap default text color */
+}
+
+.card-title {
+    color: #101316; /* Primary color for title */
     margin-bottom: 20px;
 }
 
+
+
+/* Gesture image styles */
+.gesture-img {
+    max-width: 100%; /* Maximum width for images */
+    height: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Instruction section styles */
 .instruction {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    background-color: #899bb8;
+    padding: 10%;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(123, 42, 42, 0.1);
     margin-bottom: 20px;
 }
 
 .instruction h2 {
-    color: #333;
-    margin-bottom: 10px;
+    color: #343a40; /* Bootstrap default text color */
+    margin-bottom: 20px;
 }
 
 .instruction p {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .instruction ul {
-    text-align: left;
+    list-style-type: disc;
+    margin-left: 20px;
 }
-
-.instruction ul li {
-    margin-bottom: 10px;
+.front-start {
+    text-align: center;
+    margin-top: 30px;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom:20px;
 }
-
-.gesture-icons {
-    display: flex;
-    justify-content: center;
-}
-
-.gesture-icons img {
-    margin: 0 10px;
+.front-start img {
+    width: 100%;
     max-width: 100px;
 }
 
-@media screen and (max-width: 600px) {
-    .instruction {
-        padding: 10px;
-    }
+.instruction a {
+    display: inline-block;
+    margin-top: 20px;
+    color: #fff;
+    text-decoration: none;
+    background-color: #3b3c3e; /* Bootstrap primary color */
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
+
+.instruction a:hover {
+    background-color: #a1b3c6; /* Darker shade of primary color */
+}
+
+
