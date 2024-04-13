@@ -34,12 +34,11 @@
     <div class="video-container">
         <div class="video-input">
             <div id="dis">
-                <video id="camera-preview" autoplay></video>
             </div>
         </div>
 
         <div class="video-buttons">
-            <button class="btn1 btn btn-primary btn-lg">Start</button>
+            <button id="start-btn" class="btn1 btn btn-primary btn-lg">Start</button>
             <form action="/close" class="main2">
                 <button id="close" class="btn2 btn btn-danger btn-lg">Close</button>
             </form>
@@ -47,4 +46,12 @@
     </div>
 
     <script src="../static/js/app.js"></script>
+    <script>
+        const img = document.getElementById("dis");
+        const btn = document.getElementById("start-btn");
+
+        btn.addEventListener("click", function() {
+            img.innerHTML = "<img src=\"{{ url_for('video') }}\" id=\"cam\">";
+        });
+    </script>
 </html>

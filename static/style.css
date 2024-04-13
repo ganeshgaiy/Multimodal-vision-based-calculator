@@ -38,7 +38,7 @@
     font-weight: 500;
 }
 
-video#camera-preview {
+img#cam {
     width: 700px;      /* Adjust width as needed */
     height: 500px;     /* Adjust height as needed */
     border-radius: 20px; /* Adjust border radius for desired roundness */

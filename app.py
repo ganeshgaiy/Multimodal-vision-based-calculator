@@ -2,8 +2,10 @@ from flask import Flask, render_template, Response
 import cv2
 import mediapipe as mp
 
+app = Flask(__name__)
+
 mpHands = mp.solutions.hands
-hands = mpHands.Hands()
+hands = mpHands.Hands(static_image_mode=False, max_num_hands=1)
 mpDraw = mp.solutions.drawing_utils
 
 global cam
@@ -16,8 +18,6 @@ text = ""
 k = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 idset = ["", "1", "12", "123", "1234", "01234", "0", "01", "012", "0123", "04", "4", "34", "014", "14", "234"]
 op = ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "+", "-", "*", "/"]
-
-app = Flask(__name__)
 
 def frames():
     """
@@ -37,40 +37,34 @@ def frames():
             results = hands.process(imgRGB)
 
             if results.multi_hand_landmarks:
-                for handLms in results.multi_hand_landmarks:
-                    for id, lm in enumerate(handLms.landmark):
-                        h, w, c = imgg.shape
-                        if id == 0:
-                            x = []
-                            y = []
-                        x.append(int((lm.x) * w))
-                        y.append(int((1 - lm.y) * h))
+                handLms = results.multi_hand_landmarks[0]
+                h, w, c = imgg.shape
+                x = [int(lm.x * w) for lm in handLms.landmark]
+                y = [int((1 - lm.y) * h) for lm in handLms.landmark]
 
-                        if len(y) > 20:
-                            id = ""
-                            big = [x[3], y[8], y[12], y[16], y[20]]
-                            small = [x[4], y[6], y[10], y[14], y[18]]
+                if len(y) > 20:
+                    id = ""
+                    big = [x[3], y[8], y[12], y[16], y[20]]
+                    small = [x[4], y[6], y[10], y[14], y[18]]
 
-                            for i in range(len(big)):
-                                if big[i] > small[i]:
-                                    id += str(i)
+                    for i in range(len(big)):
+                        if big[i] > small[i]:
+                            id += str(i)
 
-                            k[idset.index(id)] += 1
+                    k[idset.index(id)] += 1
 
-                            for i in range(len(k)):
-                                if k[i] > 20:
-                                    if i == 15:
-                                        ans = str(eval(text))
-                                        text = "= " + ans
-                                        for i in range(len(k)):
-                                            k[i] = 0
-                                    else:
-                                        text += op[i]
-                                        for i in range(len(k)):
-                                            k[i] = 0
+                    for i in range(len(k)):
+                        if k[i] > 20:
+                            if i == 15:
+                                ans = str(eval(text))
+                                text = "= " + ans
+                                k = [0] * len(k)
+                            else:
+                                text += op[i]
+                                k = [0] * len(k)
 
-                    cv2.putText(imgg, text, (100, 120), cv2.FONT_HERSHEY_TRIPLEX, 3, (0, 0, 0), 5)
-                    mpDraw.draw_landmarks(imgg, handLms, mpHands.HAND_CONNECTIONS)
+                cv2.putText(imgg, text, (100, 120), cv2.FONT_HERSHEY_TRIPLEX, 3, (0, 0, 0), 5)
+                mpDraw.draw_landmarks(imgg, handLms, mpHands.HAND_CONNECTIONS)
 
             else:
                 text = " "
