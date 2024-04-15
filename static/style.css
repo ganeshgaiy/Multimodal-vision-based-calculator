@@ -8,7 +8,9 @@
 }
 
 .video-input{
-    text-align: center;
+    text-align: left;
+    width: 40%;
+    
 }
 
 .video-buttons{

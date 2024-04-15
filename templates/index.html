@@ -25,25 +25,32 @@
    
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="../static/budgetTrackLogo.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
-            <span class="heading">Handy Calci: A Virtual Calculator using Hand Movements and Hand Gestures</span>
-        </a>
+            <a class="navbar-brand" href="#">
+                <img src="../static/visioncalci.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+                <span class="heading">Handy Calci: A Virtual Calculator using Hand Movements and Hand Gestures</span>
+            </a>
+            <a class="nav-link" href="/manual">Manual</a>
         </div>
     </nav>
-    <div class="video-container">
-        <div class="video-input">
-            <div id="dis">
+    <div class="video-img-container" style="display: flex;">
+        <div class="video-container" style="width: 50%; margin: 1em;">
+            <div class="video-input">
+                <div id="dis" >
+                    <br>
+                </div>  
+            </div>
+            <div class="video-buttons">
+                <button id="start-btn" class="btn1 btn btn-primary btn-lg">Start</button>
+                <form action="/close" class="main2">
+                    <button id="close" class="btn2 btn btn-danger btn-lg">Close</button>
+                </form>
             </div>
         </div>
-
-        <div class="video-buttons">
-            <button id="start-btn" class="btn1 btn btn-primary btn-lg">Start</button>
-            <form action="/close" class="main2">
-                <button id="close" class="btn2 btn btn-danger btn-lg">Close</button>
-            </form>
+        <div class="gestures">
+                <img src="../static/handgestures.jpg" alt="Image" class="video-image" style="width: 80%; max-height: 95%; margin: 1em 1em 0 1em; box-sizing: border-box;">
         </div>
     </div>
+    
 
     <script src="../static/js/app.js"></script>
     <script>

@@ -11,7 +11,24 @@ hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1)
 mp_draw = mp.solutions.drawing_utils
 cam = cv2.VideoCapture(0)
 
-id_set = ["", "1", "12", "123", "1234", "01234", "0", "01", "012", "0123", "04", "4", "34", "014", "14", "234"]
+id_set = [
+    "",
+    "1",
+    "12",
+    "123",
+    "1234",
+    "01234",
+    "0",
+    "01",
+    "012",
+    "0123",
+    "04",
+    "4",
+    "34",
+    "014",
+    "14",
+    "234",
+]
 operations = ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "+", "-", "*", "/"]
 
 # Initialize count array and text outside of the frames function to maintain state
@@ -20,6 +37,7 @@ display_text = ""
 eval_text = ""
 last_update_time = time.time()
 result_displayed = False
+
 
 def frames():
     global k, display_text, eval_text, last_update_time, result_displayed
@@ -65,35 +83,47 @@ def frames():
                                 except Exception as e:
                                     display_text = "Error"
                                     result_displayed = True
-                                eval_text = ""  # Reset eval_text after evaluation or error
+                                eval_text = (
+                                    ""  # Reset eval_text after evaluation or error
+                                )
                             else:
                                 display_text += operations[i]
                                 eval_text += operations[i]
                             k = [0] * len(k)
                             last_update_time = time.time()
 
-            cv2.putText(img, display_text, (100, 120), cv2.FONT_HERSHEY_TRIPLEX, 3, (0, 0, 0), 5)
+            cv2.putText(
+                img, display_text, (100, 120), cv2.FONT_HERSHEY_TRIPLEX, 3, (0, 0, 0), 5
+            )
             mp_draw.draw_landmarks(img, hand_lms, mp_hands.HAND_CONNECTIONS)
 
-        ret, buffer = cv2.imencode('.jpg', img)
+        ret, buffer = cv2.imencode(".jpg", img)
         frame_bytes = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        yield (
+            b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
+        )
 
-@app.route('/video')
+
+@app.route("/video")
 def video():
-    return Response(frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
-@app.route('/close')
+
+@app.route("/close")
 def close():
     cam.release()
     cv2.destroyAllWindows()
     return "Camera and all resources were released, goodbye!"
-    
 
-@app.route('/')
+    @app.route("/manual")
+    def manual():
+        close()
+        return render_template("manual.html")
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app.run(debug=True, threaded=True)
