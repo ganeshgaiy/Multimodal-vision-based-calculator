@@ -115,11 +115,6 @@ def close():
     cv2.destroyAllWindows()
     return "Camera and all resources were released, goodbye!"
 
-    @app.route("/manual")
-    def manual():
-        close()
-        return render_template("manual.html")
-
 @app.route("/")
 def index():
     return render_template("index.html")
