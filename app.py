@@ -1,103 +1,124 @@
 from flask import Flask, render_template, Response
 import cv2
 import mediapipe as mp
-
-mpHands = mp.solutions.hands
-hands = mpHands.Hands()
-mpDraw = mp.solutions.drawing_utils
-
-global cam
-cam = cv2.VideoCapture(0)
-
-x = []
-y = []
-
-text = ""
-k = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-idset = ["", "1", "12", "123", "1234", "01234", "0", "01", "012", "0123", "04", "4", "34", "014", "14", "234"]
-op = ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "+", "-", "*", "/"]
+import time
 
 app = Flask(__name__)
 
+# Global variables setup
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1)
+mp_draw = mp.solutions.drawing_utils
+cam = cv2.VideoCapture(0)
+
+id_set = [
+    "",
+    "1",
+    "12",
+    "123",
+    "1234",
+    "01234",
+    "0",
+    "01",
+    "012",
+    "0123",
+    "04",
+    "4",
+    "34",
+    "014",
+    "14",
+    "234",
+]
+operations = ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "+", "-", "*", "/"]
+
+# Initialize count array and text outside of the frames function to maintain state
+k = [0] * len(id_set)
+display_text = ""
+eval_text = ""
+last_update_time = time.time()
+result_displayed = False
+
+
 def frames():
-    """
-    Generator function that processes frames from a camera feed and yields them as JPEG images.
+    global k, display_text, eval_text, last_update_time, result_displayed
 
-    Yields:
-        bytes: JPEG image frame
-
-    """
     while True:
         success, img = cam.read()
         if not success:
             break
-        else:
-            imgg = cv2.flip(img, 1)
-            imgRGB = cv2.cvtColor(imgg, cv2.COLOR_BGR2RGB)
-            results = hands.process(imgRGB)
+        img = cv2.flip(img, 1)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        results = hands.process(img_rgb)
 
-            if results.multi_hand_landmarks:
-                for handLms in results.multi_hand_landmarks:
-                    for id, lm in enumerate(handLms.landmark):
-                        h, w, c = imgg.shape
-                        if id == 0:
-                            x = []
-                            y = []
-                        x.append(int((lm.x) * w))
-                        y.append(int((1 - lm.y) * h))
+        if results.multi_hand_landmarks:
+            if result_displayed and (time.time() - last_update_time > 2):
+                display_text = ""
+                eval_text = ""
+                result_displayed = False
 
-                        if len(y) > 20:
-                            id = ""
-                            big = [x[3], y[8], y[12], y[16], y[20]]
-                            small = [x[4], y[6], y[10], y[14], y[18]]
+            hand_lms = results.multi_hand_landmarks[0]
+            h, w, c = img.shape
+            x = [int(lm.x * w) for lm in hand_lms.landmark]
+            y = [int((1 - lm.y) * h) for lm in hand_lms.landmark]
 
-                            for i in range(len(big)):
-                                if big[i] > small[i]:
-                                    id += str(i)
+            if len(y) > 20:
+                id = ""
+                big = [x[3], y[8], y[12], y[16], y[20]]
+                small = [x[4], y[6], y[10], y[14], y[18]]
 
-                            k[idset.index(id)] += 1
+                for i in range(len(big)):
+                    if big[i] > small[i]:
+                        id += str(i)
 
-                            for i in range(len(k)):
-                                if k[i] > 20:
-                                    if i == 15:
-                                        ans = str(eval(text))
-                                        text = "= " + ans
-                                        for i in range(len(k)):
-                                            k[i] = 0
-                                    else:
-                                        text += op[i]
-                                        for i in range(len(k)):
-                                            k[i] = 0
+                if id in id_set:
+                    k[id_set.index(id)] += 1
 
-                    cv2.putText(imgg, text, (100, 120), cv2.FONT_HERSHEY_TRIPLEX, 3, (0, 0, 0), 5)
-                    mpDraw.draw_landmarks(imgg, handLms, mpHands.HAND_CONNECTIONS)
+                    for i in range(len(k)):
+                        if k[i] > 20:
+                            if i == 15:  # Assuming 15 corresponds to 'evaluate'
+                                try:
+                                    ans = str(eval(eval_text))
+                                    display_text = "= " + ans
+                                    result_displayed = True
+                                except Exception as e:
+                                    display_text = "Error"
+                                    result_displayed = True
+                                eval_text = (
+                                    ""  # Reset eval_text after evaluation or error
+                                )
+                            else:
+                                display_text += operations[i]
+                                eval_text += operations[i]
+                            k = [0] * len(k)
+                            last_update_time = time.time()
 
-            else:
-                text = " "
+            cv2.putText(
+                img, display_text, (100, 120), cv2.FONT_HERSHEY_TRIPLEX, 3, (0, 0, 0), 5
+            )
+            mp_draw.draw_landmarks(img, hand_lms, mp_hands.HAND_CONNECTIONS)
 
-            ret, buffer = cv2.imencode('.jpg', imgg)
-            imgg = buffer.tobytes()
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + imgg + b'\r\n')
+        ret, buffer = cv2.imencode(".jpg", img)
+        frame_bytes = buffer.tobytes()
+        yield (
+            b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
+        )
 
 
-@app.route('/video')
+@app.route("/video")
 def video():
-    global cam
-    cam = cv2.VideoCapture(0)
-    return Response(frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
-@app.route('/close')
+
+@app.route("/close")
 def close():
-    global cam
     cam.release()
     cv2.destroyAllWindows()
+    return "Camera and all resources were released, goodbye!"
+
+@app.route("/")
+def index():
     return render_template("index.html")
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True, threaded=True)
