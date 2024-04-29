@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Modal Vision Based Calculator</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <style>
+        body {
+            color: white;
+            background-color: rgba(0, 0, 0, 0.301);
+        }
+
+        header {
+            background-color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ffffffd5;
+        }
+
+        main {
+            background-color: #222;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #fff;
+        }
+
+        #input-area {
+            background-color: #444;
+            padding: 20px;
+        }
+
+        #result-area {
+            background-color: #444;
+            padding: 20px;
+        }
+
+        input[type="text"] {
+            background-color: #666;
+            color: #fff;
+            padding: 10px;
+            border: none;
+        }
+
+        #calculated-result {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Multi-Modal Vision Based Calculator</h1>
+    </header>
+
+    <main>
+        <section id="User Manual">
+            
+            <p style="color: rgba(128, 255, 0, 0.916);">
+                <a href="manual.html"></a>
+                    User Manual
+                </a>
+            </p>
+            <p></p>
+        </section>
+
+        <section id="input-area">
+            <h2>Input Your Calculation</h2>
+            <div id="camera-area">
+            </div>
+            <div id="text-input">
+                <input type="text" placeholder="Type your equation here...">
+            </div>
+        </section>
+
+        <section id="result-area">
+            <h2>Result</h2>
+            <div id="calculated-result">
+            </div>
+            <div id="text-output">
+                <input type="text" placeholder="Get your output here...">
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script> 
+</body>
+</html>
